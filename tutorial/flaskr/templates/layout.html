@@ -1,0 +1,51 @@
+<!doctype html>
+<head>
+<meta charset="utf-8">
+
+        <!-- viewport meta -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <style type="text/css">
+           .jumbotron { background:linear-gradient(-135deg, #D3D4D9, #06D6A0);
+                       center: no-repeat; background-size: cover;}
+           </style>
+
+</head>
+<title>Flaskr</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<!-- jQuery、Popper.js、Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<div class="jumbotron">
+  <div class="container">
+      <h1>musicapp</h1>
+      {% if session.user_id %}
+        <a href="{{ url_for('logout') }}">logout</a>
+        <a href="{{ url_for('show_entries') }}">entries</a>
+        <a href="{{ url_for('user_list') }}">users</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">login</a>
+        <a href="{{ url_for('show_entries') }}">entries</a>
+      {% endif %}
+  </div>
+</div>
+
+<div class="mx-auto" style="width: 800px;">
+
+  <!-- {% if session.user_id %}
+    <a href="{{ url_for('logout') }}">logout</a>
+    <a href="{{ url_for('show_entries') }}">entries</a>
+    <a href="{{ url_for('user_list') }}">users</a>
+  {% else %}
+    <a href="{{ url_for('login') }}">login</a>
+    <a href="{{ url_for('show_entries') }}">entries</a>
+  {% endif %} -->
+
+  {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% block body %}{% endblock %}
+</div>

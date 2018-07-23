@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h2>menu</h2>
+<form>
+  <label>lovedtrackを表示</label><br />
+  <input id="userID" type="text" size="10" placeholder="last.fmのアカウントをここに入力" class="form-control"><br>
+  <input id="usersearch" type="button" value="表示" class="btn btn-primary">
+</form>
+<a href="http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=8c42502db628c941691f3212cf636c5e&artist=HYDE&album=HYDE&format=json">HYDE</a><br>
+<a href="http://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=MIYAVI&api_key=8c42502db628c941691f3212cf636c5e&format=json">artist.gettoptags</a><br>
+<a href="http://ws.audioscrobbler.com/2.0/?method=user.getweeklyartistchart&user=monaga0518&api_key=8c42502db628c941691f3212cf636c5e&format=json">user.getweeklyartistchart</a><br>
+<a href="http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=hyde&api_key=8c42502db628c941691f3212cf636c5e&format=json&format=json">artist.getsimilar</a><br>
+<a href="http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=hyde&track=evergreen&api_key=8c42502db628c941691f3212cf636c5e&format=json">track.getsimilar</a>
+
+
+<!-- <a href="http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=monaga0518&api_key=8c42502db628c941691f3212cf636c5e&format=json&limit=2&artist.name">loved track</a> -->
+<script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+//getlovedtrackエラーなし
+$(function(){
+  //lastfmの表示ボタンをクリックしたら実行されること
+  $('#usersearch').click(function(){
+    var user = $('#userID').val()
+    $('#userIDcon').html(user + "さんの<h2>lovedtrack</h2>");
+
+    var getlovedtracksurl = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
+    //userに応じてgetlovedtracksメソッドを。jsonを読み込む
+    var userloved = $.getJSON(getlovedtracksurl, function(){
+      for( var i = 0; i < userloved.responseJSON.lovedtracks.track.length; i++){
+        var track = userloved.responseJSON.lovedtracks.track[i]
+        console.log(track.name);
+        console.log(track.artist.name);
+        $('#track').append(track.name + "---" + track.artist.name + "---").append('<br />');
+      }
+    });
+  })
+});
+  // var user = "monaga0518";
+
+
+</script>
+<div id="userIDcon"></div>
+<div id="track"></div>
+{% endblock %}
