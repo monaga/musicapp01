@@ -24,7 +24,7 @@ $(function(){
     var getweeklyurl = "http://ws.audioscrobbler.com/2.0/?method=user.getweeklytrackchart&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
     //userに応じてgetlovedtracksメソッドを。jsonを読み込む
     var userweekly = $.getJSON(getweeklyurl, function(){
-      console.log(userweekly);
+      console.log(userweekly.responseJSON);
       for( var i = 0; i < userweekly.responseJSON.weeklytrackchart.track.length; i++){
         var trackchart = userweekly.responseJSON.weeklytrackchart.track[i]
         // console.log(trackchart.image[2]["#text"]);

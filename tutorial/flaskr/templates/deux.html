@@ -29,12 +29,14 @@ $(function(){
       $.getJSON(getlovedtracksurl)
     )
     .done(function(){
-      var userweekly = $.getJSON(getweeklyurl)
-      console.log(userweekly.responseJSON.weeklytrackchart);
-      var userloved = $.getJSON(getlovedtracksurl)
-      console.log(userloved.responseJSON.lovedtracks);
-      // console.log($.getJSON(getlovedtracksurl.responseJSON));
-      // console.log($.getJSON(getlovedtracksurl.responseJSON.lovedtracks.track["0"].artist.name));
+      var userweekly = $.getJSON(getweeklyurl, function(){
+        console.log(userweekly.responseJSON.weeklytrackchart.track[0]);
+      });
+
+      var userloved = $.getJSON(getlovedtracksurl, function(){
+        console.log(userloved.responseJSON.lovedtracks.track[0]);
+      });
+
     })
     .fail(function(){
       console.log('error');
