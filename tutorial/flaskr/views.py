@@ -3,7 +3,7 @@ from flask import request, redirect, url_for, render_template, flash, abort, \
         jsonify, session, g
 from flaskr import app, db
 from flaskr.models import Entry, User
-import requests
+import requests, json, sys, urllib3
 
 def login_required(f):
     @wraps(f)
@@ -114,10 +114,14 @@ def logout():
 def menu():
     return render_template('menu.html')
 
+@app.route('/deux')
+def deux():
+    return render_template('deux.html')
+
 @app.route('/restaurants')
 def restaurants():
-    payload = {'keyid': '8c42502db628c941691f3212cf636c5e', 'format': 'json'}
-    r = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=8c42502db628c941691f3212cf636c5e&artist=HYDE&album=HYDE&format=json', params=payload)
+    # payload = {'keyid': '8c42502db628c941691f3212cf636c5e', 'format': 'json'}
+    r = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=8c42502db628c941691f3212cf636c5e&artist=HYDE&album=HYDE&format=json')
     data = r.json()
     print(data)
     # rests=data["album"]

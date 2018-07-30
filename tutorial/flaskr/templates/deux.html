@@ -2,9 +2,8 @@
 {% block body %}
   <h2>menu</h2>
 <form>
-  <label>lovedtrackを表示</label><br />
-  <input id="userID" type="text" size="10" placeholder="last.fmのアカウントをここに入力" class="form-control"><br>
-  <input id="usersearch" type="button" value="getlovedtracks" class="btn btn-primary">
+  <label>getweeklyartistchartを表示</label><br />
+  <input id="userID" type="text" size="10" placeholder="1人目のlast.fmのアカウントをここに入力" class="form-control"><br>
   <input id="usersearch2" type="button" value="user.getweeklyartistchart" class="btn btn-primary">
 </form>
 <a href="http://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=MIYAVI&api_key=8c42502db628c941691f3212cf636c5e&format=json">artist.gettoptags</a><br>
@@ -22,18 +21,31 @@ $(function(){
     $('#userIDcon2').html(user + "さんの<h2>getweeklytrackchart</h2>");
 
     var getweeklyurl = "http://ws.audioscrobbler.com/2.0/?method=user.getweeklytrackchart&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
+    var getlovedtracksurl = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
     //userに応じてgetlovedtracksメソッドを。jsonを読み込む
-    var userweekly = $.getJSON(getweeklyurl, function(){
-      console.log(userweekly);
-      for( var i = 0; i < userweekly.responseJSON.weeklytrackchart.track.length; i++){
-        var trackchart = userweekly.responseJSON.weeklytrackchart.track[i]
-        // console.log(trackchart.image[2]["#text"]);
-        // $('#trackimg').children('img').attr('src', trackchart.image[2]["#text"]);
-        // $('#trackimg').append("<img src=" + trackchart.image[2]["#text"] + ">");
-        $('#trackchart').append( "<img src=" + trackchart.image[2]["#text"] + ">" + trackchart.name + "   【" + trackchart.artist["#text"]+ "】").append('<br /><br>');
-      }
 
+    $.when(
+      $.getJSON(getweeklyurl),
+      $.getJSON(getlovedtracksurl)
+    )
+    .done(function(){
+      var userweekly = $.getJSON(getweeklyurl)
+      console.log(userweekly.responseJSON.weeklytrackchart);
+      var userloved = $.getJSON(getlovedtracksurl)
+      console.log(userloved.responseJSON.lovedtracks);
+      // console.log($.getJSON(getlovedtracksurl.responseJSON));
+      // console.log($.getJSON(getlovedtracksurl.responseJSON.lovedtracks.track["0"].artist.name));
+    })
+    .fail(function(){
+      console.log('error');
     });
+    // var userweekly = $.getJSON(getweeklyurl, function(){
+    //   for( var i = 0; i < userweekly.responseJSON.weeklytrackchart.track.length; i++){
+    //     var trackchart = userweekly.responseJSON.weeklytrackchart.track[i]
+    //
+    //   }
+    //
+    // });
   })
 });
 </script>
