@@ -14,7 +14,7 @@ $(function(){
   //lastfmの表示ボタンをクリックしたら実行されること
   $('#usersearch2').click(function(){
     var user = $('#userID').val()
-    $('#userIDcon2').html(user + "さんの<h2>好きな曲は</h2>");
+    $('#userIDcon2').html('<h2>' + user + "さんの好きな曲は</h2>");
 
     var getweeklyurl = "http://ws.audioscrobbler.com/2.0/?method=user.getweeklytrackchart&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
     var getlovedtracksurl = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
@@ -27,17 +27,18 @@ $(function(){
     )
     .done(function(){
       var userweekly = $.getJSON(getweeklyurl, function(){
-        //とりあえず1曲（6番めに聴く曲）だけ
+        //とりあえず1曲（番めに聴く曲）だけ
           var weeklytrackname = userweekly.responseJSON.weeklytrackchart.track[5].name
           var weeklytrackartist = userweekly.responseJSON.weeklytrackchart.track[5].artist["#text"]
-          $('#weekly').html(weeklytrackname + "【" + weeklytrackartist + "】<br>");
+          var weeklytrackimg = userweekly.responseJSON.weeklytrackchart.track[5].image[2]["#text"]
+          $('#weekly').html("<img src=" + weeklytrackimg + ">" + weeklytrackname + "【" + weeklytrackartist + "】<br>");
           console.log(weeklytrackname);
           console.log(weeklytrackartist);
           var artistgetsimilarurl = "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=" + weeklytrackartist + "&api_key=8c42502db628c941691f3212cf636c5e&format=json&format=json"
           var artistgetsimilar = $.getJSON(artistgetsimilarurl, function(){
             var artistsimilar = artistgetsimilar.responseJSON.similarartists.artist[0].name
             var artistsimilar_img = artistgetsimilar.responseJSON.similarartists.artist[0].image[2]["#text"]
-            $('#artistsimilar').html(user + "さんの<h2>おすすめアーティストは</h2><br><br>" + artistsimilar + "<br><img src=" + artistsimilar_img + "><br><br>お勧めの曲は");
+            $('#artistsimilar').html("<h2>" + user + "さんのおすすめアーティストは</h2><br>" + artistsimilar + "<br><img src=" + artistsimilar_img + "><br><br>お勧めの曲は");
             console.log(artistsimilar);
             //アーティストの有名な曲を返す
             var artistgettoptracksurl = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=" + artistsimilar + "&api_key=8c42502db628c941691f3212cf636c5e&format=json"
@@ -62,7 +63,7 @@ $(function(){
             console.log(tracksimilar_name);
             console.log(tracksimilar_artist);
             console.log(tracksimilar_img);
-            $('#track').html(user + "さんの<h2>お勧め曲は</h2>" + "<img src=" + tracksimilar_img + ">" + tracksimilar_name + "   【" + tracksimilar_artist + "】").append('<br /><br>');
+            $('#track').html("<h2>" + user + "さんのお勧め曲は</h2>" + "<img src=" + tracksimilar_img + ">" + tracksimilar_name + "   【" + tracksimilar_artist + "】").append('<br /><br>');
           });
 
 
@@ -115,9 +116,9 @@ $(function(){
 
 
 <div id="userIDcon2"></div>
-<div id="weekly" class="col-sm-4"></div><br>
+<div id="weekly"></div><br>
 <div id="artistsimilar"></div>
-<div id="trackimg" class="col-sm-4"></div>
+<div id="trackimg"></div>
 <div id="artistgettoptrack"></div><br>
 <div id="track"></div>
 
