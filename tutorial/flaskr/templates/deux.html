@@ -6,10 +6,6 @@
   <input id="userID" type="text" size="10" placeholder="1人目のlast.fmのアカウントをここに入力" class="form-control"><br>
   <input id="usersearch2" type="button" value="user.getweeklyartistchart" class="btn btn-primary">
 </form>
-<a href="http://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=MIYAVI&api_key=8c42502db628c941691f3212cf636c5e&format=json">artist.gettoptags</a><br>
-<a href="http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=hyde&api_key=8c42502db628c941691f3212cf636c5e&format=json&format=json">artist.getsimilar</a><br>
-<a href="http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=hyde&track=evergreen&api_key=8c42502db628c941691f3212cf636c5e&format=json">track.getsimilar</a>
-
 <!-- <a href="http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=monaga0518&api_key=8c42502db628c941691f3212cf636c5e&format=json&limit=2&artist.name">loved track</a> -->
 <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
@@ -18,10 +14,11 @@ $(function(){
   //lastfmの表示ボタンをクリックしたら実行されること
   $('#usersearch2').click(function(){
     var user = $('#userID').val()
-    $('#userIDcon2').html(user + "さんの<h2>getweeklytrackchart</h2>");
+    $('#userIDcon2').html(user + "さんの<h2>好きな曲は</h2>");
 
     var getweeklyurl = "http://ws.audioscrobbler.com/2.0/?method=user.getweeklytrackchart&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
     var getlovedtracksurl = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
+
     //userに応じてgetlovedtracksメソッドを。jsonを読み込む
 
     $.when(
@@ -30,17 +27,59 @@ $(function(){
     )
     .done(function(){
       var userweekly = $.getJSON(getweeklyurl, function(){
-        console.log(userweekly.responseJSON.weeklytrackchart.track[0]);
+        //とりあえず1曲（6番めに聴く曲）だけ
+          var weeklytrackname = userweekly.responseJSON.weeklytrackchart.track[5].name
+          var weeklytrackartist = userweekly.responseJSON.weeklytrackchart.track[5].artist["#text"]
+          $('#weekly').html(weeklytrackname + "【" + weeklytrackartist + "】<br>");
+          console.log(weeklytrackname);
+          console.log(weeklytrackartist);
+          var artistgetsimilarurl = "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=" + weeklytrackartist + "&api_key=8c42502db628c941691f3212cf636c5e&format=json&format=json"
+          var artistgetsimilar = $.getJSON(artistgetsimilarurl, function(){
+            var artistsimilar = artistgetsimilar.responseJSON.similarartists.artist[0].name
+            var artistsimilar_img = artistgetsimilar.responseJSON.similarartists.artist[0].image[2]["#text"]
+            $('#artistsimilar').html(user + "さんの<h2>おすすめアーティストは</h2><br><br>" + artistsimilar + "<br><img src=" + artistsimilar_img + "><br><br>お勧めの曲は");
+            console.log(artistsimilar);
+            //アーティストの有名な曲を返す
+            var artistgettoptracksurl = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=" + artistsimilar + "&api_key=8c42502db628c941691f3212cf636c5e&format=json"
+            var artistgettoptrack = $.getJSON(artistgettoptracksurl, function(){
+              for( var i = 0; i < 5; i++){
+                //５０個くらい出てくるので間引きした方がいい
+                console.log(artistgettoptrack.responseJSON.toptracks.track[i].name);
+                $('#artistgettoptrack').append((i+1) + "：" + artistgettoptrack.responseJSON.toptracks.track[i].name).append('<br>');
+              }
+
+              // for( var i = 0; i < artistgettoptrack.responseJSON.lovedtracks.track.length; i++){
+              //   var track = userloved.responseJSON.lovedtracks.track[i]
+              // }
+
+            });
+          });
+          var trackgetsimilarurl = "http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=" + weeklytrackartist + "&track=" + weeklytrackname + "&api_key=8c42502db628c941691f3212cf636c5e&format=json"
+          var trackgetsimilar = $.getJSON(trackgetsimilarurl,function(){
+            var tracksimilar_name = trackgetsimilar.responseJSON.similartracks.track["0"].name
+            var tracksimilar_artist = trackgetsimilar.responseJSON.similartracks.track["0"].artist.name
+            var tracksimilar_img = trackgetsimilar.responseJSON.similartracks.track["0"].image[2]["#text"]
+            console.log(tracksimilar_name);
+            console.log(tracksimilar_artist);
+            console.log(tracksimilar_img);
+            $('#track').html(user + "さんの<h2>お勧め曲は</h2>" + "<img src=" + tracksimilar_img + ">" + tracksimilar_name + "   【" + tracksimilar_artist + "】").append('<br /><br>');
+          });
+
+
+
       });
 
-      var userloved = $.getJSON(getlovedtracksurl, function(){
-        console.log(userloved.responseJSON.lovedtracks.track[0]);
-      });
+      //
+      // var userloved = $.getJSON(getlovedtracksurl, function(){
+      //   console.log(userloved.responseJSON.lovedtracks.track[0]);
+      // });
 
     })
     .fail(function(){
       console.log('error');
     });
+
+
     // var userweekly = $.getJSON(getweeklyurl, function(){
     //   for( var i = 0; i < userweekly.responseJSON.weeklytrackchart.track.length; i++){
     //     var trackchart = userweekly.responseJSON.weeklytrackchart.track[i]
@@ -52,7 +91,7 @@ $(function(){
 });
 </script>
 
-<script>
+<!-- <script>
 //getlovedtrackエラーなし
 $(function(){
   //lastfmの表示ボタンをクリックしたら実行されること
@@ -72,12 +111,16 @@ $(function(){
     });
   })
 });
-</script>
+</script> -->
 
-<div id="userIDcon"></div>
-<div id="trackimg"></div>
-<div id="track"></div>
 
 <div id="userIDcon2"></div>
+<div id="weekly" class="col-sm-4"></div><br>
+<div id="artistsimilar"></div>
+<div id="trackimg" class="col-sm-4"></div>
+<div id="artistgettoptrack"></div><br>
+<div id="track"></div>
+
+
 <div id="trackchart"></div>
 {% endblock %}

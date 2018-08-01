@@ -51,10 +51,11 @@ $(function(){
     var userloved = $.getJSON(getlovedtracksurl, function(){
       for( var i = 0; i < userloved.responseJSON.lovedtracks.track.length; i++){
         var track = userloved.responseJSON.lovedtracks.track[i]
-        console.log(track.image[3]["#text"]);
+        // console.log(track.image[3]["#text"]);
         // console.log(track.artist.name);
         $('#track').append("<img src=" + track.image[2]["#text"] + ">" + track.name + "   【" + track.artist.name + "】").append('<br /><br>');
       }
+      return track.image[3]["#text"];
     });
   })
 });
