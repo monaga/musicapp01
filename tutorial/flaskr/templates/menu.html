@@ -1,70 +1,36 @@
 {% extends "layout.html" %}
 {% block body %}
   <h2>menu</h2>
-<form>
-  <label>lovedtrackを表示</label><br />
-  <input id="userID" type="text" size="10" placeholder="last.fmのアカウントをここに入力" class="form-control"><br>
-  <input id="usersearch" type="button" value="getlovedtracks" class="btn btn-primary">
-  <input id="usersearch2" type="button" value="user.getweeklyartistchart" class="btn btn-primary">
+<form method="get" action="/menu">
+  <label>ユーザの嗜好を表示</label><br />
+  <input name="userID[]" type="text" size="10" placeholder="last.fmのアカウントをここに入力" class="form-control"><br>
+  <input name="userID[]" type="text" size="10" placeholder="last.fmのアカウントをここに入力" class="form-control"><br>
+  <input name="userID[]" type="text" size="10" placeholder="last.fmのアカウントをここに入力" class="form-control"><br>
+  <input type="submit" value="送信" class="btn btn-primary">
 </form>
-<a href="http://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=MIYAVI&api_key=8c42502db628c941691f3212cf636c5e&format=json">artist.gettoptags</a><br>
-<a href="http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=hyde&api_key=8c42502db628c941691f3212cf636c5e&format=json&format=json">artist.getsimilar</a><br>
-<a href="http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=hyde&track=evergreen&api_key=8c42502db628c941691f3212cf636c5e&format=json">track.getsimilar</a>
+{{ weeklymbid }}
+{% if weeklytrackcharts %}
+{% for user, weeklytrackchart in weeklytrackcharts.items() %}
+<h2>{{ user }}さんのweeklytrackchart</h2>
+{% for song in weeklytrackchart %}
+  {{ song['name'] }}<br>
+  {{ song['artist']['#text'] }}<br>
+  <img src="{{ song['image'][2]['#text'] }}"><br>
+{% endfor %}
+{% endfor %}
+{% endif %}
+{% if lovedtracks %}
+{% for user, lovedtrack in lovedtracks.items() %}
+<h2>{{ user }}さんのlovedtrack</h2>
+{% for song in lovedtrack %}
+  {{ song['name'] }}<br>
+  {{ song['artist']['name'] }}<br>
+  <img src="{{ song['image'][2]['#text'] }}"><br>
 
-<!-- <a href="http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=monaga0518&api_key=8c42502db628c941691f3212cf636c5e&format=json&limit=2&artist.name">loved track</a> -->
-<script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script>
-//getweeklytrackchart
-$(function(){
-  //lastfmの表示ボタンをクリックしたら実行されること
-  $('#usersearch2').click(function(){
-    var user = $('#userID').val()
-    $('#userIDcon2').html(user + "さんの<h2>getweeklytrackchart</h2>");
+{% endfor %}
+{% endfor %}
+{% endif %}
 
-    var getweeklyurl = "http://ws.audioscrobbler.com/2.0/?method=user.getweeklytrackchart&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
-    //userに応じてgetlovedtracksメソッドを。jsonを読み込む
-    var userweekly = $.getJSON(getweeklyurl, function(){
-      console.log(userweekly.responseJSON);
-      for( var i = 0; i < userweekly.responseJSON.weeklytrackchart.track.length; i++){
-        var trackchart = userweekly.responseJSON.weeklytrackchart.track[i]
-        // console.log(trackchart.image[2]["#text"]);
-        // $('#trackimg').children('img').attr('src', trackchart.image[2]["#text"]);
-        // $('#trackimg').append("<img src=" + trackchart.image[2]["#text"] + ">");
-        $('#trackchart').append( "<img src=" + trackchart.image[2]["#text"] + ">" + trackchart.name + "   【" + trackchart.artist["#text"]+ "】").append('<br /><br>');
-      }
 
-    });
-  })
-});
-</script>
 
-<script>
-//getlovedtrackエラーなし
-$(function(){
-  //lastfmの表示ボタンをクリックしたら実行されること
-  $('#usersearch').click(function(){
-    var user = $('#userID').val()
-    $('#userIDcon').html(user + "さんの<h2>lovedtrack</h2>");
-
-    var getlovedtracksurl = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
-    //userに応じてgetlovedtracksメソッドを。jsonを読み込む
-    var userloved = $.getJSON(getlovedtracksurl, function(){
-      for( var i = 0; i < userloved.responseJSON.lovedtracks.track.length; i++){
-        var track = userloved.responseJSON.lovedtracks.track[i]
-        // console.log(track.image[3]["#text"]);
-        // console.log(track.artist.name);
-        $('#track').append("<img src=" + track.image[2]["#text"] + ">" + track.name + "   【" + track.artist.name + "】").append('<br /><br>');
-      }
-      return track.image[3]["#text"];
-    });
-  })
-});
-</script>
-
-<div id="userIDcon"></div>
-<div id="trackimg"></div>
-<div id="track"></div>
-
-<div id="userIDcon2"></div>
-<div id="trackchart"></div>
 {% endblock %}

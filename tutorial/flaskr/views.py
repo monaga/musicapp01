@@ -4,6 +4,9 @@ from flask import request, redirect, url_for, render_template, flash, abort, \
 from flaskr import app, db
 from flaskr.models import Entry, User
 import requests, json, sys, urllib3
+import pdb
+from collections import Counter
+import collections
 
 def login_required(f):
     @wraps(f)
@@ -112,7 +115,63 @@ def logout():
 
 @app.route('/menu')
 def menu():
-    return render_template('menu.html')
+    users = request.args.getlist('userID[]')
+    users = list(filter(lambda u: len(u) > 0, users))
+    if users:
+        # {'monaga0518': weeklytrackchart, 'marutaku': weeklytrackchart}
+        weeklytrackcharts = {}
+        for user in users:
+            url = "http://ws.audioscrobbler.com/2.0/?method=user.getweeklytrackchart&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
+            # print(url)
+            r = requests.get(url)
+            data = r.json()
+            # print(data)
+            # print(data['weeklytrackchart']['track'])
+            weeklytrackchart = data['weeklytrackchart']['track']
+            weeklytrackcharts[user] = weeklytrackchart
+
+
+        # 完全一致を調べる
+        weekly_urls = []
+        for user in users:
+            for song in weeklytrackcharts[user]:
+                weekly_urls.append(song['url'])
+        print(Counter(weekly_urls))
+
+
+        # for song in weeklytrackchart:
+            # print(song)
+        lovedtracks = {}
+        for user in users:
+            url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
+            # print(url)
+            r = requests.get(url)
+            data = r.json()
+            lovedtrack = data['lovedtracks']['track']
+            lovedtracks[user] = lovedtrack
+
+        loved_urls = []
+        for user in users:
+            for song in lovedtracks[user]:
+                loved_urls.append(song['url'])
+        print(Counter(loved_urls))
+        c = collections.Counter(loved_urls)
+        print(c.most_common())
+
+        # weekly_urls = []
+        # for user in users:
+        #     for song in lovedtracks[user]:
+        #         weekly_urls.append(song['url'])
+        # print(Counter(weekly_urls))
+
+
+
+
+    else:
+        weeklytrackcharts = None
+        lovedtracks = None
+    # return render_template('menu.html', user=user, weeklytrackcharts=weeklytrackcharts, lovedtracks=lovedtracks)
+    return render_template('menu.html', weeklytrackcharts=weeklytrackcharts, lovedtracks=lovedtracks)
 
 @app.route('/deux')
 def deux():
