@@ -11,10 +11,11 @@
 {{ weeklymbid }}
 <!-- 完全一致する曲 -->
 {% if recommend_songs %}
+<h2>プレイリスト1</h2>
   {% for song in recommend_songs %}
-    <h2>プレイリスト1</h2>
     {{ song['name'] }}<br>
-    {{ song['artist']['name'] }}<br>
+    {{ song['artist']['name'] }}
+    {{ song['artist']['#text'] }}<br>
     <img src="{{ song['image'][2]['#text'] }}"><br>
   {% endfor %}
 {% endif %}

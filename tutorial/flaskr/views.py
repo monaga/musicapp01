@@ -130,15 +130,6 @@ def menu():
             weeklytrackchart = data['weeklytrackchart']['track']
             weeklytrackcharts[user] = weeklytrackchart
 
-
-        # 完全一致を調べる（weekly）
-        weekly_urls = []
-        for user in users:
-            for song in weeklytrackcharts[user]:
-                weekly_urls.append(song['url'])
-        print(Counter(weekly_urls))
-
-
         # for song in weeklytrackchart:
             # print(song)
         lovedtracks = {}
@@ -162,8 +153,7 @@ def menu():
             for song in lovedtracks[user]:
                 loved_urls.append(song['url'])
 
-        ## 同じurlを含むものの取得
-
+        ## 同じurlを含むものの取得(lovedtracks)
         recommend_songs_url = []
         for url, count in Counter(loved_urls).items():
             if count > 1:
@@ -171,6 +161,27 @@ def menu():
 
         recommend_songs = []
         for track in lovedtracks_set:
+            if track['url'] in recommend_songs_url:
+                recommend_songs.append(track)
+
+        # 完全一致を調べる（weekly）
+        weeklytrackcharts_set = []
+        for tracks in weeklytrackcharts.values():
+            weeklytrackcharts_set.extend(tracks)
+        weeklytrackcharts_set = list({track['url']: track for track in weeklytrackcharts_set}.values())
+
+        weekly_urls = []
+        for user in users:
+            for song in weeklytrackcharts[user]:
+                weekly_urls.append(song['url'])
+        print(Counter(weekly_urls))
+
+        ## 同じurlを含むものの取得(weeklytrackcharts)
+        for url, count in Counter(weekly_urls).items():
+            if count > 1:
+                recommend_songs_url.append(url)
+
+        for track in weeklytrackcharts_set:
             if track['url'] in recommend_songs_url:
                 recommend_songs.append(track)
 
@@ -188,7 +199,7 @@ def menu():
                 similartracks[user] = similartrack
                 # print(similartracks[user])
 
-        #類似曲の中で同じurlを含むものの取得
+        ##類似曲の中で同じurlを含むものの取得(lovedtracks)
         similartracks_set = []
         for tracks in similartracks.values():
             similartracks_set.extend(tracks)
@@ -196,6 +207,41 @@ def menu():
         similartracks_set = list({track['url']: track for track in similartracks_set}.values())
 
         similar_urls = []
+        for user in users:
+            for song in similartracks[user]:
+                similar_urls.append(song['url'])
+                # print(similar_urls)
+
+        for url, count in Counter(similar_urls).items():
+            if count > 1:
+                recommend_songs_url.append(url)
+
+        for track in similartracks_set:
+            if track['url'] in recommend_songs_url:
+                recommend_songs.append(track)
+
+
+        # weeklyから類似する曲を取得
+        # similartracks = {}
+        for user, similartrack in weeklytrackcharts.items():
+            for song in similartrack:
+                # song['name']
+                # song['artist']['name']
+                url = "http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=" + song['artist']['#text'] + "&track=" + song['name'] + "&api_key=8c42502db628c941691f3212cf636c5e&format=json"
+                # print(url)
+                r = requests.get(url)
+                data = r.json()
+                similartrack = data['similartracks']['track']
+                similartracks[user] = similartrack
+                # print(similartracks[user])
+
+        ##類似曲の中で同じurlを含むものの取得(weekly)
+        for tracks in similartracks.values():
+            similartracks_set.extend(tracks)
+            # print(similartracks_set)
+        similartracks_set = list({track['url']: track for track in similartracks_set}.values())
+
+        # similar_urls = []
         for user in users:
             for song in similartracks[user]:
                 similar_urls.append(song['url'])
