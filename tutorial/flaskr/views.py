@@ -255,6 +255,9 @@ def menu():
             if track['url'] in recommend_songs_url:
                 recommend_songs.append(track)
 
+        #アーティストの類似度が高い曲を取得(weekly)
+        
+
 
 
 
