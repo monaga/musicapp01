@@ -255,8 +255,50 @@ def menu():
             if track['url'] in recommend_songs_url:
                 recommend_songs.append(track)
 
-        #アーティストの類似度が高い曲を取得(weekly)
-        
+        #アーティストの類似度が高い曲を取得(lovedtracks)
+        similarartists = {}
+        for user, lovedtrack in lovedtracks.items():
+            for song in lovedtrack:
+                url = "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=" + song['artist']['name'] + "&api_key=8c42502db628c941691f3212cf636c5e&format=json&format=json"
+                # print(url)
+                r = requests.get(url)
+                data = r.json()
+                # print(data['similarartists']['artist'])
+                similarartist = data['similarartists']['artist']
+                similarartists[user] = similarartist
+                # print(similarartists[user])
+
+        ##類似アーティストの中で同じurlを含む者の取得(lovedtracks)
+        similarartists_set = []
+        for artists in similarartists.values():
+            similarartists_set.extend(artists)
+            # print(similarartists_set)
+        similarartists_set = list({artist['url']: artist for artist in similarartists_set}.values())
+
+        similarartist_urls = []
+        for user in users:
+            for song in similarartists[user]:
+                similarartist_urls.append(song['url'])
+
+        recommend_artist_url = []
+        for url, count in Counter(similarartist_urls).items():
+            if count > 1:
+                recommend_artist_url.append(url)
+
+        recommend_artists = []
+        print('='*30)
+        for artist in similarartists_set:
+            if artist['url'] in recommend_artist_url:
+                recommend_artists.append(artist['name'])
+                print(recommend_artists)
+        print('='*30)
+        # var artistgettoptracksurl = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=" + artistsimilar + "&api_key=8c42502db628c941691f3212cf636c5e&format=json"
+
+
+
+
+
+
 
 
 
