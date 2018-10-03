@@ -119,6 +119,7 @@ def menu():
     users = list(filter(lambda u: len(u) > 0, users))
     if users:
         # {'monaga0518': weeklytrackchart, 'marutaku': weeklytrackchart}
+        #### ユーザの情報の取得
         weeklytrackcharts = {}
         for user in users:
             url = "http://ws.audioscrobbler.com/2.0/?method=user.getweeklytrackchart&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
@@ -141,8 +142,9 @@ def menu():
             lovedtrack = data['lovedtracks']['track']
             lovedtracks[user] = lovedtrack
             # print(lovedtracks[user])
+        #### ユーザの情報の取得end
 
-        # 完全一致を調べる（lovedtracks）
+        #### 完全一致を調べる（lovedtracks）
         lovedtracks_set = []
         for tracks in lovedtracks.values():
             lovedtracks_set.extend(tracks)
@@ -163,6 +165,7 @@ def menu():
         for track in lovedtracks_set:
             if track['url'] in recommend_songs_url:
                 recommend_songs.append(track)
+        #### 完全一致を調べる（lovedtracks）end
 
         # 完全一致を調べる（weekly）
         weeklytrackcharts_set = []
@@ -266,6 +269,7 @@ def menu():
                 # print(data['similarartists']['artist'])
                 similarartist = data['similarartists']['artist']
                 similarartists[user] = similarartist
+                # raise Exception
                 # print(similarartists[user])
 
         ##類似アーティストの中で同じurlを含む者の取得(lovedtracks)
@@ -286,13 +290,21 @@ def menu():
                 recommend_artist_url.append(url)
 
         recommend_artists = []
-        print('='*30)
         for artist in similarartists_set:
             if artist['url'] in recommend_artist_url:
                 recommend_artists.append(artist['name'])
-                print(recommend_artists)
-        print('='*30)
-        # var artistgettoptracksurl = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=" + artistsimilar + "&api_key=8c42502db628c941691f3212cf636c5e&format=json"
+        print(recommend_artists)
+
+        for recommend_artist in recommend_artists:
+            url = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=" + recommend_artist + "&api_key=8c42502db628c941691f3212cf636c5e&format=json"
+            r = requests.get(url)
+            data = r.json()
+            recommend_songs.append(data['toptracks']['track'][0])
+            recommend_songs.append(data['toptracks']['track'][1]['name'])
+        # print("=="*30)
+        # print(recommend_songs)
+        # print("=="*30)
+
 
 
 
