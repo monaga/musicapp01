@@ -13,11 +13,13 @@
 {% if recommend_songs %}
 <h2>プレイリスト1</h2>
   {% for song in recommend_songs %}
-    {{ song['name'] }}<br>
-    {{ song['artist']['name'] }}
-    {{ song['artist']['#text'] }}<br>
+    {% if 'artist' in song %}
+      {{ song['name'] }}<br>
+      {{ song['artist']['name'] }}
+      {{ song['artist']['#text'] }}<br>
     <img src="{{ song['image'][2]['#text'] }}"><br>
-  {% endfor %}
+    {% endif %}
+      {% endfor %}
 {% endif %}
 
 <!-- lovedtrackから類似する曲を取得 -->
