@@ -1,61 +1,32 @@
 {% extends "layout.html" %}
 {% block body %}
+<div class="mx-auto" style="width: 400px;">
   <h2>menu</h2>
+
 <form method="get" action="/menu">
-  <label>ユーザの嗜好を表示</label><br />
+  <label>プレイリスト作成</label><br />
   <input name="userID[]" type="text" size="10" placeholder="last.fmのアカウントをここに入力" class="form-control"><br>
   <input name="userID[]" type="text" size="10" placeholder="last.fmのアカウントをここに入力" class="form-control"><br>
   <input name="userID[]" type="text" size="10" placeholder="last.fmのアカウントをここに入力" class="form-control"><br>
-  <input type="submit" value="送信" class="btn btn-primary">
+  <input type="submit" value="作成" class="btn btn-primary">
 </form>
 {{ weeklymbid }}
 <!-- 完全一致する曲 -->
 {% if recommend_songs %}
-<h2>プレイリスト1</h2>
+<h2>プレイリスト</h2>
+
   {% for song in recommend_songs %}
+  <div class="card">
     {% if 'artist' in song %}
-      {{ song['name'] }}<br>
-      {{ song['artist']['name'] }}
-      {{ song['artist']['#text'] }}<br>
-    <img src="{{ song['image'][2]['#text'] }}"><br>
+      <a class="text-center" href = "{{ song['url'] }}">{{ song['name'] }}</a><br>
+      <b class="text-center">{{ song['artist']['name'] }}{{ song['artist']['#text'] }}</b><br>
+    <!-- <img src="{{ song['image'][2]['#text'] }}" width="180" height="180"><br> -->
+    <img src="{{ song['image'][2]['#text'] }}" width="180" height="180" class="rounded mx-auto d-block"><br>
+    <!-- <p></p> -->
     {% endif %}
-      {% endfor %}
-{% endif %}
-
-<!-- lovedtrackから類似する曲を取得 -->
-{% if similartracks %}
-  {% for user, similartrack in similartracks.items() %}
-    <h2>lovedtrackの類似曲</h2>
-      {% for song in similartrack %}
-        {{ song['name'] }}<br>
-        {{ song['artist']['name'] }}<br>
-        <img src="{{ song['image'][2]['#text'] }}"><br>
-      {% endfor %}
+  </div>
   {% endfor %}
 {% endif %}
-
-
-{% if weeklytrackcharts %}
-  {% for user, weeklytrackchart in weeklytrackcharts.items() %}
-    <h2>{{ user }}さんのweeklytrackchart</h2>
-      {% for song in weeklytrackchart %}
-        {{ song['name'] }}<br>
-        {{ song['artist']['#text'] }}<br>
-        <img src="{{ song['image'][2]['#text'] }}"><br>
-      {% endfor %}
-  {% endfor %}
-{% endif %}
-
-{% if lovedtracks %}
-  {% for user, lovedtrack in lovedtracks.items() %}
-    <h2>{{ user }}さんのlovedtrack</h2>
-      {% for song in lovedtrack %}
-        {{ song['name'] }}<br>
-        {{ song['artist']['name'] }}<br>
-        <img src="{{ song['image'][2]['#text'] }}"><br>
-      {% endfor %}
-  {% endfor %}
-{% endif %}
-
 
 {% endblock %}
+</div>

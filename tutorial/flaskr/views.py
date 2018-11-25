@@ -7,7 +7,8 @@ import requests, json, sys, urllib3
 import pdb
 from collections import Counter
 import collections
-import pickle
+from flaskr.config import LAST_FM_APIKEY
+
 def login_required(f):
     @wraps(f)
     def decorated_view(*args, **kwargs):
@@ -122,7 +123,7 @@ def menu():
         #### ユーザの情報の取得
         weeklytrackcharts = {}
         for user in users:
-            url = "http://ws.audioscrobbler.com/2.0/?method=user.getweeklytrackchart&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
+            url = "http://ws.audioscrobbler.com/2.0/?method=user.getweeklytrackchart&user={}&api_key={}&format=json".format(user, LAST_FM_APIKEY);
             # print(url)
             r = requests.get(url)
             data = r.json()
@@ -135,7 +136,7 @@ def menu():
             # print(song)
         lovedtracks = {}
         for user in users:
-            url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=" + user + "&api_key=8c42502db628c941691f3212cf636c5e&format=json";
+            url = "http://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=" + user + "&api_key={}&format=json".format(LAST_FM_APIKEY);
             # print(url)
             r = requests.get(url)
             data = r.json()
@@ -190,17 +191,23 @@ def menu():
 
         # lovedtrackから類似する曲を取得
         similartracks = {}
-        for user, lovedtrack in lovedtracks.items():
-            for song in lovedtrack:
-                # song['name']
-                # song['artist']['name']
-                url = "http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=" + song['artist']['name'] + "&track=" + song['name'] + "&api_key=8c42502db628c941691f3212cf636c5e&format=json"
-                # print(url)
-                r = requests.get(url)
-                data = r.json()
-                similartrack = data['similartracks']['track']
-                similartracks[user] = similartrack
-                # print(similartracks[user])
+        if lovedtracks:
+                
+
+            for user, lovedtrack in lovedtracks.items():
+            # for user, lovedtrack in range(5):
+
+
+                for song in lovedtrack:
+                    # song['name']
+                    # song['artist']['name']
+                    url = "http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=" + song['artist']['name'] + "&track=" + song['name'] + "&api_key={}&format=json".format(LAST_FM_APIKEY);
+                    # print(url)
+                    r = requests.get(url)
+                    data = r.json()
+                    similartrack = data['similartracks']['track']
+                    similartracks[user] = similartrack
+                    # print(similartracks[user])
 
         ##類似曲の中で同じurlを含むものの取得(lovedtracks)
         similartracks_set = []
@@ -227,10 +234,15 @@ def menu():
         # weeklyから類似する曲を取得
         # similartracks = {}
         for user, similartrack in weeklytrackcharts.items():
+        # for user, similartrack in range(5):
             for song in similartrack:
+            # for song in range(5):
                 if "#" in song["name"]:
                     continue
-                    url = "http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=" + song['artist']['#text'] + "&track=" + song['name'] + "&api_key=8c42502db628c941691f3212cf636c5e&format=json"
+                    if song > 5:
+                        break
+                else:
+                    url = "http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=" + song['artist']['#text'] + "&track=" + song['name'] + "&api_key={}&format=json".format(LAST_FM_APIKEY);
                     # print(url)
                     r = requests.get(url)
                     data = r.json()
@@ -262,7 +274,7 @@ def menu():
         similarartists = {}
         for user, lovedtrack in lovedtracks.items():
             for song in lovedtrack:
-                url = "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=" + song['artist']['name'] + "&api_key=8c42502db628c941691f3212cf636c5e&format=json&format=json"
+                url = "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=" + song['artist']['name'] + "&api_key={}&format=json&format=json".format(LAST_FM_APIKEY);
                 # print(url)
                 r = requests.get(url)
                 data = r.json()
@@ -296,7 +308,7 @@ def menu():
         # print(recommend_artists)
 
         for recommend_artist in recommend_artists:
-            url = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=" + recommend_artist + "&api_key=8c42502db628c941691f3212cf636c5e&format=json"
+            url = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=" + recommend_artist + "&api_key={}&format=json".format(LAST_FM_APIKEY);
             r = requests.get(url)
             data = r.json()
             recommend_songs.append(data['toptracks']['track'][0])
@@ -309,7 +321,7 @@ def menu():
         # similarartists = {}
         for user, similartrack in weeklytrackcharts.items():
             for song in similartrack:
-                url = "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=" + song['artist']['#text'] + "&api_key=8c42502db628c941691f3212cf636c5e&format=json&format=json"
+                url = "http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=" + song['artist']['#text'] + "&api_key={}&format=json&format=json".format(LAST_FM_APIKEY);
                 # print(url)
                 r = requests.get(url)
                 data = r.json()
@@ -338,14 +350,15 @@ def menu():
         for artist in similarartists_set:
             if artist['url'] in recommend_artist_url:
                 recommend_artists.append(artist['name'])
-        print(recommend_artists)
+        # print(recommend_artists)
 
         for recommend_artist in recommend_artists:
-            url = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=" + recommend_artist + "&api_key=8c42502db628c941691f3212cf636c5e&format=json"
+            url = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=" + recommend_artist + "&api_key={}&format=json".format(LAST_FM_APIKEY);
             r = requests.get(url)
             data = r.json()
             recommend_songs.append(data['toptracks']['track'][0])
             recommend_songs.append(data['toptracks']['track'][1]['name'])
+            # print(recommend_songs)
 
 
 
@@ -380,10 +393,4 @@ def deux():
 
 @app.route('/restaurants')
 def restaurants():
-    # payload = {'keyid': '8c42502db628c941691f3212cf636c5e', 'format': 'json'}
-    r = requests.get('http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=8c42502db628c941691f3212cf636c5e&artist=HYDE&album=HYDE&format=json')
-    data = r.json()
-    print(data)
-    # rests=data["album"]
-
     return render_template('restaurants.html')

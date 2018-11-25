@@ -1,0 +1,34 @@
+<!-- lovedtrackから類似する曲を取得 -->
+{% if similartracks %}
+  {% for user, similartrack in similartracks.items() %}
+    <h2>lovedtrackの類似曲</h2>
+      {% for song in similartrack %}
+        {{ song['name'] }}<br>
+        {{ song['artist']['name'] }}<br>
+        <img src="{{ song['image'][2]['#text'] }}"><br>
+      {% endfor %}
+  {% endfor %}
+{% endif %}
+
+
+{% if weeklytrackcharts %}
+  {% for user, weeklytrackchart in weeklytrackcharts.items() %}
+    <h2>{{ user }}さんのweeklytrackchart</h2>
+      {% for song in weeklytrackchart %}
+        {{ song['name'] }}<br>
+        {{ song['artist']['#text'] }}<br>
+        <img src="{{ song['image'][2]['#text'] }}"><br>
+      {% endfor %}
+  {% endfor %}
+{% endif %}
+
+{% if lovedtracks %}
+  {% for user, lovedtrack in lovedtracks.items() %}
+    <h2>{{ user }}さんのlovedtrack</h2>
+      {% for song in lovedtrack %}
+        {{ song['name'] }}<br>
+        {{ song['artist']['name'] }}<br>
+        <img src="{{ song['image'][2]['#text'] }}"><br>
+      {% endfor %}
+  {% endfor %}
+{% endif %}
